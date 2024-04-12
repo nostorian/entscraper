@@ -314,7 +314,3 @@ class Scraper:
             time.sleep(durations * 60)
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}+{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Left {class_list[0]['class_title']}{Fore.RESET}")
             driver.quit()
-
-
-if __name__ == "__main__":
-    entrar = Scraper("BN/16609", "$CHIRANJEEVI0103$", save_data=True)
