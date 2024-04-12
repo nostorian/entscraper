@@ -5,12 +5,17 @@ import json
 import time
 import requests
 import threading
+import urllib.parse as urlparse
 from pystyle import *
+from os.path import splitext
 from bs4 import BeautifulSoup
+
 from datetime import datetime
 from colorama import Fore, init
 import chromedriver_autoinstaller
 from seleniumwire import webdriver
+
+
 
 
 
@@ -92,7 +97,7 @@ class Scraper:
         user_name = user_profile.find('span').text.strip()
         return user_name
 
-    def scrape_assignments(self, subject):
+    def scrape_assignments(self, subject, download_links=False):
         if subject not in self.subject_dict:
             raise Exception("Subject not found! Either Invalid Credentials or Invalid Subject were provided.")
         self._login()
@@ -159,8 +164,23 @@ class Scraper:
 
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}+{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Assignments saved to {Fore.YELLOW}assignments.json{Fore.RESET}")
         
-        # what if user wants every assignment link to be downloaded?
-        # problem for another day
+        # what if user wants every assignment link to be downloaded 
+        if download_links == True:
+            for assignment in assignment_list:
+                if not os.path.exists(subject):
+                    os.mkdir(subject)
+                print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTBLUE_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.LIGHTBLUE_EX}Downloading {assignment['assign_tag']}...{Fore.RESET}")
+                if assignment['attach_link'] != None:
+                    attachment_link = assignment['attach_link']
+                    attachment_name = attachment_link.split('/')[-1]
+                    attachment = self.session.get(attachment_link, headers=headers)
+                    attachment_name = os.path.join(subject, assignment['assign_tag'])
+                    file_ext = splitext(urlparse.urlparse(attachment_link).path)[1]
+                    with open(f"{attachment_name}{file_ext}", 'wb') as f:
+                        f.write(attachment.content)
+                    print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}+{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Downloaded {os.path.join(os.getcwd(), f'{attachment_name}{file_ext}')}{Fore.RESET}")
+                else:
+                    print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}-{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}No attachment link available for {assignment['assign_tag']}{Fore.RESET}")
 
         return assignment_list
 

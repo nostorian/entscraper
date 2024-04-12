@@ -1,6 +1,7 @@
 # made with hands by fw-real, discord: @nostorian
 import os
 import time
+import json
 from pystyle import *
 from colorama import Fore, init
 from entrar_backend import Scraper
@@ -18,6 +19,27 @@ def clear():
         print('\n'*120)
     return
 
+def execution():
+    os.system("title EntScraper")
+    # check if credentials.json exists and if it doesn't, create it
+    if not os.path.exists("credentials.json"):
+        with open("credentials.json", "w") as f:
+            f.write('{"username": "", "password": ""}')
+        return False
+    # check if the file is empty
+    elif os.stat("credentials.json").st_size == 0:
+        with open("credentials.json", "w") as f:
+            f.write('{"username": "", "password": ""}')
+        return False
+    # check if values are empty
+    elif os.stat("credentials.json").st_size != 0:
+        with open("credentials.json", "r") as f:
+            data = json.load(f)
+            if data.get("username") == "" or data.get("password") == "":
+                return False
+            else:
+                return True
+
 
 
 def main():
@@ -32,8 +54,17 @@ def main():
     print("\n")
     Write.Print(Center.XCenter("Kindly be mindful of your usage of this tool."), color=Colors.cyan, interval=0.00)
     print("\n\n")
-    username = Write.Input("(->) Enter your username: ", color=Colors.green, interval=0.00).upper()
-    password = Write.Input("(->) Enter your password: ", color=Colors.green, interval=0.00)
+    if not execution():
+        username = Write.Input("(->) Enter your username: ", color=Colors.green, interval=0.00).upper()
+        password = Write.Input("(->) Enter your password: ", color=Colors.green, interval=0.00)
+        # Save the entered credentials to the JSON file
+        with open("credentials.json", "w") as f:
+            json.dump({"username": username, "password": password}, f)
+    else:
+        with open("credentials.json", "r") as f:
+            data = json.load(f)
+            username = data["username"]
+            password = data["password"]
     scraping_choice = Write.Input("(?) Do you want to scrape data to json(y/n)?: ", color=Colors.light_blue, interval=0.00)
     # CHECK IF ANY OF THEM IS EMPTY
     if username == "" or password == "" or scraping_choice == "":
@@ -93,6 +124,11 @@ def main():
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}An error occurred: {e}{Fore.RESET}")
             input()
     elif choice == "2":
+        download_choice = Write.Input("(?) Do you want to download the attachments(y/n)?: ", color=Colors.light_blue, interval=0.00)
+        if download_choice == "y" or download_choice == "Y":
+            download = True
+        elif download_choice == "n" or download_choice == "N":
+            download = False
         # the only subjects available are: {"physics": "91", "english": "92", "maths": "98", "computers": "124", "chemistry": "138", "economics": "139"}
         # print menu
         clear()
@@ -114,7 +150,7 @@ def main():
             a = {"1": "physics", "2": "english", "3": "maths", "4": "computers", "5": "chemistry", "6": "economics"}
             subject = a[subject]
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Fetching assignments...{Fore.RESET}")
-            assignments = e.scrape_assignments(subject)
+            assignments = e.scrape_assignments(subject, download_links=download)
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}+{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Assignments fetched successfully.{Fore.RESET}")
             print("\n")
             for assignment in assignments:
