@@ -40,7 +40,25 @@ def execution():
             else:
                 return True
 
+def create_startup_script():
+    startup_path = os.path.join(os.getenv("APPDATA"), "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
+    f = open(startup_path + "\\entStartup.bat", "w")
+    f.write("@echo off\n")
+    f.write("cd " + f"\"{startup_path}" + "\\EntScraper\"\n")
+    f.write("python " + f"\"{startup_path}" + "\\EntScraper\\startup.py\"\n")
+    f.write("pause\n")
+    f.close()
 
+def add_to_startup():
+    startup_path = os.path.join(os.getenv("APPDATA"), "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
+    folderName = "EntScraper"
+    os.makedirs(os.path.join(startup_path, folderName), exist_ok=True)
+    os.system(f'copy entrar_backend.py "{os.path.join(startup_path, folderName)}" >logs')
+    os.system(f'copy startup.py "{os.path.join(startup_path, folderName)}" >logs')
+    os.system(f'copy credentials.json "{os.path.join(startup_path, folderName)}" >logs')
+    create_startup_script()
+    
+    print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}+{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Added to startup{Fore.RESET}")
 
 def main():
     clear()
@@ -67,16 +85,16 @@ def main():
             password = data["password"]
     scraping_choice = Write.Input("(?) Do you want to scrape data to json(y/n)?: ", color=Colors.light_blue, interval=0.00)
     # CHECK IF ANY OF THEM IS EMPTY
-    if username == "" or password == "" or scraping_choice == "":
+    if username == "" or password == "":
         print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Please fill in all fields.{Fore.RESET}")
-        input()
-        return
+        input("Press any key to continue...")
+        main()
     if scraping_choice == "y" or scraping_choice == "Y":
         scrape = True
     elif scraping_choice == "n" or scraping_choice == "N":
         scrape = False
     else:
-        print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}-{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice, defaulting to no scraping.{Fore.RESET}")
+        print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}-{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice, defaulting to no scraping.{Fore.RESET}")
         scrape = False
     e = Scraper(username, password, scrape)
     try:
@@ -103,14 +121,15 @@ def main():
     print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}1{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.WHITE}Get Announcements{Fore.RESET}")
     print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}2{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.WHITE}Get Assignments{Fore.RESET}")
     print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}3{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.WHITE}Join Online Class{Fore.RESET}")
-    print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}4{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.WHITE}Exit{Fore.RESET}")
+    print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}4{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.WHITE}Add to Startup{Fore.RESET}")
+    print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}5{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.WHITE}Exit{Fore.RESET}")
 
     choice = Write.Input("(->) Enter your choice: ", color=Colors.green, interval=0.00)
-    choices = ["1", "2", "3"]
+    choices = ["1", "2", "3", "4", "5"]
     if choice not in choices:
-        print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice, exiting...{Fore.RESET}")
-        input()
-        return
+        print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice!{Fore.RESET}")
+        input("Press any key to continue...")
+        main()
     if choice == "1":
         print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Fetching announcements...{Fore.RESET}")
         try:
@@ -128,6 +147,10 @@ def main():
         if download_choice == "y" or download_choice == "Y":
             download = True
         elif download_choice == "n" or download_choice == "N":
+            download = False
+        else:
+            print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice, defaulting to no downloading.{Fore.RESET}")
+            time.sleep(3)
             download = False
         # the only subjects available are: {"physics": "91", "english": "92", "maths": "98", "computers": "124", "chemistry": "138", "economics": "139"}
         # print menu
@@ -156,7 +179,8 @@ def main():
             for assignment in assignments:
                 print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}{assignment['assign_tag']}: {assignment['assign_desc']}:-\n{Fore.WHITE}Assignment Link: {assignment['attach_link']}\nIssued Date: {assignment['start_date']}\nDue Date: {assignment['end_date']}{Fore.RESET}")
                 print("\n\n")
-            input()
+            input("Press any key to continue...")
+            main()
         except Exception as e:
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}An error occurred: {e}{Fore.RESET}")
             input()
@@ -168,8 +192,36 @@ def main():
         except Exception as e:
             print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}An error occurred: {e}{Fore.RESET}")
             input()
-    else:
+    elif choice == "5":
         print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Exiting...{Fore.RESET}")
-        input()
+        input("Press any key to continue...")
         return
+    elif choice == "4":
+        # add a warning  confirmation
+        w_ch = Write.Input("(?) Are you sure you want to add this tool to startup(y/n)?: ", color=Colors.light_blue, interval=0.00)
+        if w_ch.lower() == "y":
+            # check if the tool is already in startup
+            startup_path = os.path.join(os.getenv("APPDATA"), "Microsoft", "Windows", "Start Menu", "Programs", "Startup")
+            if os.path.exists(startup_path + "\\entStartup.bat") and os.path.exists(startup_path + "\\EntScraper"):
+                print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}The tool is already in startup!{Fore.RESET}")
+                input("Press any key to continue...")
+                main()
+            print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Adding to startup...{Fore.RESET}")
+            time.sleep(5)
+            add_to_startup()
+            input("Press any key to continue...")
+            main()
+        elif w_ch.lower() == "n":
+            # tell them aight 
+            print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTGREEN_EX}#{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.GREEN}Alright, not adding to startup.{Fore.RESET}")
+            input("Press any key to continue...")
+            main()
+        else:
+            print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice!{Fore.RESET}")
+            input("Press any key to continue...")
+            main()
+    else:
+        print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}!{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid choice!{Fore.RESET}")
+        input("Press any key to continue...")
+        main()
 main()

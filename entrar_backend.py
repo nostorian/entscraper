@@ -64,7 +64,8 @@ class Scraper:
         real = self.session.post(login_url, data=login_payload)
         auth_soup = BeautifulSoup(real.text, 'html.parser')
         if auth_soup.find('li', class_='user-profile header-notification') == None:
-            raise Exception("Invalid Credentials were provided.")
+            print(f"{Fore.LIGHTBLACK_EX}({Fore.RESET}{Fore.LIGHTRED_EX}-{Fore.RESET}{Fore.LIGHTBLACK_EX}){Fore.RESET} {Fore.RED}Invalid Credentials were provided.{Fore.RESET}")
+            exit()
         
 
     def _get_headers(self):
