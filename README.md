@@ -1,10 +1,17 @@
 # entscraper
 Python scraper for https://entrar.in
 
-## if u a dps kid or sum from bangalore. ig u will get how to use it.
+## this project is for students from schools which use [entrar](https://entrar.in/) as their erp
 ### execution:
 ### 1. `pip install -r requirements.txt` 
 ### 2. `python3 main.py` or however you run your py files just run `main.py`
+
+### features
+### 1. scrape announcements (data scraped can be saved to json as per choice)
+### 2. scrape assignments (data scraped can be saved to json as per choice)
+### 3. download assignment files to the subject folder locally as per choice
+### 4. join the first online class available
+### 5. add the online class joiner to startup for instant login upon booting your PC.
 
 ### updates...?
 ### 1. ~~config file usage for faster execution prolly soon~~ added ✅
