@@ -1,4 +1,4 @@
-# made withhands by fw-real, discord: @nostorian
+# made withhands by fw-real, discord: @fw.nos
 import os
 import re
 import json
